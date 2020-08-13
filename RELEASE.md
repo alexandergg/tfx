@@ -20,7 +20,6 @@
     package without explicit Tensorflow dependency.
 
 ## Bug fixes and other changes
-
 *   Introduced dependency to `tensorflow-cloud` Python package, with intention
     to separate out Google Cloud Platform specific extensions.
 *   Depends on `tensorflow-cloud>=0.1,<0.2`.
@@ -28,6 +27,9 @@
 *   New extra dependencies `[examples]` is required to use codes inside
     tfx/examples.
 *   Fixed the run_component script.
+*   Added a new template, 'iris' which is simple subset of existing iris
+    examples.
+
 
 ### For pipeline authors
 

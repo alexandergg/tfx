@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Base class to define how to operator an executor."""
+import sys
 
 from typing import Any, Dict, List, Optional, cast
 
@@ -22,7 +23,6 @@ from tfx.dsl.components.base import base_executor
 from tfx.orchestration.portable import base_executor_operator
 from tfx.proto.orchestration import executable_spec_pb2
 from tfx.proto.orchestration import execution_result_pb2
-from tfx.proto.orchestration import pipeline_pb2
 from tfx.utils import import_utils
 
 from google.protobuf import message
@@ -82,9 +82,11 @@ class PythonExecutorOperator(base_executor_operator.BaseExecutorOperator):
     del platform_config
     super(PythonExecutorOperator, self).__init__(executor_spec)
     python_class_executor_spec = cast(
-        pipeline_pb2.ExecutorSpec.PythonClassExecutorSpec, self._executor_spec)
+        executable_spec_pb2.PythonClassExecutableSpec, self._executor_spec)
     self._executor_cls = import_utils.import_class_by_path(
         python_class_executor_spec.class_path)
+    self._extra_flags = python_class_executor_spec.extra_flags
+    self._extra_flags.extend(sys.argv[1:])
 
   def run_executor(
       self, execution_info: base_executor_operator.ExecutionInfo
@@ -97,8 +99,8 @@ class PythonExecutorOperator(base_executor_operator.BaseExecutorOperator):
     Returns:
       The output from executor.
     """
-    # TODO(b/162980675): Set arguments for Beam when it is available.
     context = base_executor.BaseExecutor.Context(
+        beam_pipeline_args=self._extra_flags,
         executor_output_uri=execution_info.executor_output_uri,
         stateful_working_dir=execution_info.stateful_working_dir)
     executor = self._executor_cls(context=context)

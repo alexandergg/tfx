@@ -156,7 +156,7 @@ class CompilerTest(tf.test.TestCase):
             pusher,
         ],
         enable_cache=True,
-        beam_pipeline_args=[],
+        beam_pipeline_args=["--direct_running_mode=multi_processing"],
         # Attaching `TrainerArgs` as platform config is not sensible practice,
         # but is only for testing purpose.
         platform_config=trainer_pb2.TrainArgs(num_steps=2000))
